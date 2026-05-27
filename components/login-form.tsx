@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export function LoginForm({
@@ -24,29 +23,32 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isRegistered = searchParams.get("registered") === "true";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
-      if (authError) throw authError;
 
-      if (authData?.user) {
-        const { data: userData, error: dbError } = await supabase
-          .from("users")
-          .select("role")
-          .eq("id", authData.user.id)
-          .single();
+      const data = await res.json();
 
-        if (dbError || !userData || userData.role !== "admin") {
-          await supabase.auth.signOut();
+      if (!res.ok) {
+        throw new Error(data.error || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
+      }
+
+      if (data?.user) {
+        if (data.user.role !== "admin") {
+          await fetch("/api/auth/logout", { method: "POST" });
           throw new Error("คุณไม่มีสิทธิ์เข้าใช้งานในส่วนนี้");
         }
 
@@ -68,6 +70,11 @@ export function LoginForm({
           <CardDescription>
             Enter your email below to login to your admin account
           </CardDescription>
+          {isRegistered && (
+            <div className="p-3 text-sm text-green-600 bg-green-50 rounded-md border border-green-200 mt-2">
+              สมัครสมาชิกสำเร็จ! กรุณาลงชื่อเข้าใช้งาน
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin}>

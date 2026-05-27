@@ -1,4 +1,5 @@
 import { PrismaClient } from '@/lib/generated/prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -19,10 +20,12 @@ async function main() {
 
     // 2. Seed Admin User
     const adminEmail = "admin@example.com";
+    const hashedPassword = await bcrypt.hash("admin123", 10);
     const adminUser = await prisma.user.create({
         data: {
             id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
             email: adminEmail,
+            passwordHash: hashedPassword,
             role: "admin"
         }
     });

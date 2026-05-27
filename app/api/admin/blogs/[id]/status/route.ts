@@ -1,11 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {toggleBlogStatusService} from "@/app/api/service/blog";
 
 export async function PATCH(
-    { params }: { params: { id: string } }
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const { id } = await params;
         const updatedBlog = await toggleBlogStatusService({ blogId: id });
 
         return NextResponse.json({ success: true, blog: updatedBlog }, { status: 200 });

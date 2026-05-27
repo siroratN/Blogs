@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { createClient } from "@/lib/supabase/client";
 
 const menuItems = [
     { title: 'Home', icon: Home, path: '/' },
@@ -34,8 +33,7 @@ export default function SidebarUI({ user }: SidebarUIProps) {
 
     const handleLogout = async () => {
         try {
-            const supabase = createClient();
-            await supabase.auth.signOut();
+            await fetch("/api/auth/logout", { method: "POST" });
             router.push("/");
             router.refresh();
         } catch (error) {
