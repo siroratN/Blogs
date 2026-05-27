@@ -22,8 +22,7 @@ export async function comparePassword(password: string, hash: string): Promise<b
     return await bcrypt.compare(password, hash);
 }
 
-//Generate a JWT token containing user details (Edge-compatible)
-
+//Generate a JWT token
 export async function signToken(payload: JWTPayload): Promise<string> {
     return await new SignJWT({
         userId: payload.userId,
@@ -35,8 +34,7 @@ export async function signToken(payload: JWTPayload): Promise<string> {
         .sign(JWT_SECRET_KEY);
 }
 
-// Verify a JWT token and return the payload (Edge-compatible)
-
+// Verify a JWT token and return the payload 
 export async function verifyToken(token: string): Promise<JWTPayload | null> {
     try {
         const { payload } = await jwtVerify(token, JWT_SECRET_KEY);
@@ -50,8 +48,7 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
     }
 }
 
-//Get authenticated user from Server Component context (via cookies)
-
+//Get authenticated user from Server Component
 export async function getAuthUser(): Promise<JWTPayload | null> {
     try {
         const cookieStore = await cookies();
@@ -65,23 +62,15 @@ export async function getAuthUser(): Promise<JWTPayload | null> {
     }
 }
 
-/**
- * Helper to set httpOnly auth cookie in responses
- */
-export function setAuthCookie(token: string, responseHeaders?: Headers) {
-    const isProd = process.env.NODE_ENV === 'production';
-    // Max age: 7 days in seconds
-    const maxAge = 7 * 24 * 60 * 60;
-    const cookieString = `${COOKIE_NAME}=${token}; Path=/; HttpOnly; ${isProd ? 'Secure;' : ''} SameSite=Lax; Max-Age=${maxAge}`;
+//set httpOnly auth cookie in responses
+export function setAuthCookie(token: string, responseHeaders: Headers) {
+    const maxAge = 7 * 24 * 60 * 60; // 7 วัน
+    const cookieString = `${COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`;
     
-    if (responseHeaders) {
-        responseHeaders.append('Set-Cookie', cookieString);
-    }
+    responseHeaders.append('Set-Cookie', cookieString);
 }
 
-/**
- * Helper to delete the auth cookie (logout)
- */
+//clear auth cookie on logout
 export function deleteAuthCookie(responseHeaders?: Headers) {
     const cookieString = `${COOKIE_NAME}=; Path=/; HttpOnly; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT`;
     if (responseHeaders) {

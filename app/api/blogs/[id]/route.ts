@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getBlogById } from "@/app/api/service/blog";
 
+// Get blog post by ID for public view
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }

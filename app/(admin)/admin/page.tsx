@@ -51,10 +51,10 @@ export default function AdminBlogPage() {
         setBlogs(prev => prev.map(b => b.id === id ? { ...b, isPublished: !currentStatus } : b));
     
         try {
-            const res = await fetch(`api/admin/blogs`, { 
+            const res = await fetch(`api/admin/blogs/${id}/status`, { 
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id })
+                // body: JSON.stringify({ id })
             });
     
             if (!res.ok) throw new Error("Update failed");

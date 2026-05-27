@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { editBlogService } from "@/app/api/service/blog";
 
+
+// Edit blog post by ID
 export async function PUT(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {toggleBlogStatusService} from "@/app/api/service/blog";
 
+// Toggle blog status (publish/unpublish)
 export async function PATCH(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
