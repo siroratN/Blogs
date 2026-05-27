@@ -1,4 +1,4 @@
-# 📝 Blog Management Web Application (Next.js + Custom JWT Auth + Prisma)
+# Blog Web Application (Next.js + Custom JWT Auth + Prisma)
 
 พัฒนาด้วย Next.js (App Router), Custom Auth (JWT + Cookie-Based), PostgreSQL และ Prisma ORM ในการเชื่อมต่อฐานข้อมูล
 ---
