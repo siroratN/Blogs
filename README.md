@@ -37,8 +37,8 @@ NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your-anon-key-here"
 
 # URL เชื่อมต่อฐานข้อมูลสำหรับ Prisma (Project Overview -> ORM(prisma))
-DATABASE_URL="postgresql://postgres.your-project:...@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?pgbouncer=true"
-DIRECT_URL="postgresql://postgres.your-project:...@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"
+DATABASE_URL="postgresql://postgres.your-project:[YOUR-PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.your-project:[YOUR-PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"
 
 # คีย์ลับสำหรับเซ็นชื่อ JWT Token (ตั้งเป็นข้อความยาวๆ อะไรก็ได้)
 JWT_SECRET="your-super-secret-key-make-it-long-and-random-12345"
