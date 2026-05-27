@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+model User {
+  id        String   @id @db.Uuid 
+  email     String   @unique     
+  role      String   @default("member")  // member or admin
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Blog {
+  id          String      @id @default(uuid()) @db.Uuid
+  title       String
+  slug        String      @unique
+  coverImage  String?     @map("cover_image")
+  summary     String
+  content     String
+  viewsCount  Int         @default(0) @map("views_count")
+  isPublished Boolean     @default(false) @map("is_published")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  
+  blogImages  BlogImage[]
+  comments    Comment[]
+
+  @@map("blogs")
+}
+
+model BlogImage {
+  id       String   @id @default(uuid()) @db.Uuid
+  blogId   String   @map("blog_id") @db.Uuid
+  imageUrl String   @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  blog     Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  @@map("blog_images")
+}
+
+model Comment {
+  id         String   @id @default(uuid()) @db.Uuid
+  blogId     String   @map("blog_id") @db.Uuid
+  authorName String   @map("author_name")
+  content    String
+  status     String   @default("pending") // pending, approved, rejected
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  blog       Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
