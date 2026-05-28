@@ -92,6 +92,8 @@ npm install
 # URL และ Anon Key ของ Supabase (Project Overview -> Framwork(next.js))
 NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your-anon-key-here"
+# service_role ของ supabase (Project setting -> API KEY -> Legacy anon, service_role API keys (tab)
+SUPABASE_SERVICE_ROLE_KEY=""
 
 # URL เชื่อมต่อฐานข้อมูลสำหรับ Prisma (Project Overview -> ORM(prisma))
 DATABASE_URL="postgresql://postgres.your-project:[YOUR-PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?pgbouncer=true"
