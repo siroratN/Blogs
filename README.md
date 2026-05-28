@@ -1,9 +1,5 @@
 # Blog Web Application (Next.js + Custom JWT Auth + Prisma)
 
-เว็บแอปพลิเคชันบล็อกที่พัฒนาด้วย Next.js (App Router), ระบบยืนยันตัวตนแบบกำหนดเอง (Custom JWT + Cookie-Based), ฐานข้อมูล PostgreSQL และเชื่อมต่อผ่าน Prisma ORM
-
----
-
 ## คำอธิบายเทคโนโลยีที่เลือกใช้ (Tech Stack)
 
 | หมวดหมู่ (Category) | เทคโนโลยีที่เลือกใช้ (Tech) | รายละเอียดและเหตุผลในการตัดสินใจเลือกใช้ (Rationale) |
