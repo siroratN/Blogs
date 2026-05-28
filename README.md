@@ -13,14 +13,10 @@
 | **Notifications** | **React Hot Toast** | ใช้แสดงการตอบสนองของระบบ เช่น ข้อความยืนยันการบันทึกสำเร็จหรือแจ้งเตือนเมื่อการอัปโหลดไฟล์ภาพเกิดข้อผิดพลาด |
 
 ---
-## Database
+## โครงสร้างและความสัมพันธ์ของฐานข้อมูล (Database Schema & ER Diagram)
 <img width="2314" height="1478" alt="image" src="https://github.com/user-attachments/assets/0a1c9feb-2071-477e-9ad8-320315e2e391" />
 
 ---
-
-
-## โครงสร้างและความสัมพันธ์ของฐานข้อมูล (Database Schema & ER Diagram)
-
 ### 1. รายละเอียดตาราง (Table Structural Specifications)
 
 #### ตาราง `users` (ระบบบัญชีผู้ดูแลระบบ)
