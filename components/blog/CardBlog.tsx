@@ -7,7 +7,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import Link from "next/link"
-import { Calendar, Eye, BookOpen } from "lucide-react"
+import { Calendar, Eye } from "lucide-react"
 import Image from "next/image"
 import { PaginationBlogs } from "@/components/blog/Pagination"
 import { getAllPublicBlogsByPage } from "@/app/api/service/blog" 
@@ -52,16 +52,6 @@ export default async function BlogListPage({ searchParams }: BlogListProps) {
     if (!blogs || blogs.length === 0) {
         return (
             <div className="w-full max-w-6xl mx-auto px-4 py-12">
-                <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-                    <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-semibold tracking-wide">
-                        <BookOpen className="h-3.5 w-3.5" />
-                        <span>บทความและสาระน่ารู้</span>
-                    </div>
-                    <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight sm:text-5xl">
-                        {q ? "ผลการค้นหาบทความ" : "บทความทั้งหมด"}
-                    </h1>
-                </div>
-
                 <div className="text-center py-20 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200 max-w-xl mx-auto p-8 backdrop-blur-sm">
                     <p className="text-slate-400 font-medium text-base">
                         {q ? `ไม่พบข้อมูลบทความที่ตรงกับ "${q}"` : "ไม่พบข้อมูลบทความในหน้านี้"}
