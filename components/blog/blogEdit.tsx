@@ -102,13 +102,6 @@ export default function BlogEdit() {
         }
     }, []);
 
-    const removeCoverImage = () => {
-        setCoverFile(null);
-        if (coverFilePreview) URL.revokeObjectURL(coverFilePreview);
-        setCoverFilePreview("");
-        setCoverCleared(true);
-    };
-
     const onGalleryDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[]) => {
         if (fileRejections.length > 0) {
             fileRejections.forEach((rejection) => {
@@ -268,11 +261,11 @@ export default function BlogEdit() {
                                 </span>
                                 <span className="text-[10px] text-[#FF9494]/70 mt-1 select-none">รองรับเฉพาะ .png, .jpg, .jpeg (ไม่เกิน 10MB)</span>
                             </div>
-                            {activeCoverPreview && (
+                            {/* {activeCoverPreview && (
                                 <button type="button" onClick={removeCoverImage} className="w-full py-2 text-xs font-bold text-red-500 hover:bg-red-50 border border-red-200 rounded-xl flex items-center justify-center gap-1.5 transition">
                                     <Trash2 className="w-4 h-4" /> ลบรูปภาพปก
                                 </button>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>
