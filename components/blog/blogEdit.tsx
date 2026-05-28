@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useParams, useRouter } from "next/navigation";
 import { UploadCloud, Trash2, ArrowLeft, Save } from "lucide-react";
 import toast from "react-hot-toast";
+import { useDropzone, FileRejection } from "react-dropzone";
 
 interface BlogData {
     title: string;
@@ -81,26 +82,25 @@ export default function BlogEdit() {
         fetchBlog();
     }, [blogId, reset]);
 
-    const handleCoverFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const ext = file.name.split('.').pop()?.toLowerCase();
-            const allowedExtensions = ['png', 'jpg', 'jpeg'];
-            if (!ext || !allowedExtensions.includes(ext)) {
-                toast.error("รองรับเฉพาะไฟล์รูปภาพนามสกุล .png, .jpg, .jpeg เท่านั้น");
-                e.target.value = "";
-                return;
-            }
-            if (file.size > 10 * 1024 * 1024) {
+    const onCoverDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[]) => {
+        if (fileRejections.length > 0) {
+            const rejection = fileRejections[0];
+            if (rejection.errors[0]?.code === 'file-too-large') {
                 toast.error("ขนาดไฟล์รูปภาพหน้าปกต้องไม่เกิน 10MB");
-                e.target.value = "";
-                return;
+            } else if (rejection.errors[0]?.code === 'file-invalid-type') {
+                toast.error("รองรับเฉพาะไฟล์รูปภาพนามสกุล .png, .jpg, .jpeg เท่านั้น");
+            } else {
+                toast.error(rejection.errors[0]?.message || "ไฟล์รูปภาพไม่ถูกต้อง");
             }
+            return;
+        }
+        const file = acceptedFiles[0];
+        if (file) {
             setCoverFile(file);
             setCoverFilePreview(URL.createObjectURL(file));
             setCoverCleared(false);
         }
-    };
+    }, []);
 
     const removeCoverImage = () => {
         setCoverFile(null);
@@ -109,35 +109,30 @@ export default function BlogEdit() {
         setCoverCleared(true);
     };
 
-    const handleGalleryFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const allowedExtensions = ['png', 'jpg', 'jpeg'];
-            const validNewItems: GalleryItem[] = [];
-            
-            for (let i = 0; i < e.target.files.length; i++) {
-                const file = e.target.files[i];
-                const ext = file.name.split('.').pop()?.toLowerCase();
-                if (!ext || !allowedExtensions.includes(ext)) {
-                    toast.error(`ไฟล์ ${file.name} ไม่รองรับ (รองรับเฉพาะ .png, .jpg, .jpeg)`);
-                    continue;
+    const onGalleryDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[]) => {
+        if (fileRejections.length > 0) {
+            fileRejections.forEach((rejection) => {
+                if (rejection.errors[0]?.code === 'file-too-large') {
+                    toast.error(`ไฟล์ ${rejection.file.name} มีขนาดใหญ่เกินไป (ต้องไม่เกิน 10MB)`);
+                } else if (rejection.errors[0]?.code === 'file-invalid-type') {
+                    toast.error(`ไฟล์ ${rejection.file.name} ไม่รองรับ (รองรับเฉพาะ .png, .jpg, .jpeg)`);
+                } else {
+                    toast.error(`ไฟล์ ${rejection.file.name} ไม่ถูกต้อง: ${rejection.errors[0]?.message}`);
                 }
-                if (file.size > 10 * 1024 * 1024) {
-                    toast.error(`ไฟล์ ${file.name} มีขนาดใหญ่เกินไป (ต้องไม่เกิน 10MB)`);
-                    continue;
-                }
-                validNewItems.push({
+            });
+        }
+
+        if (acceptedFiles.length > 0) {
+            setGalleryItems((prev) => {
+                const newItems = acceptedFiles.map((file) => ({
                     type: "file" as const,
                     file,
                     imageUrl: URL.createObjectURL(file),
-                });
-            }
-            
-            if (validNewItems.length > 0) {
-                setGalleryItems((prev) => [...prev, ...validNewItems]);
-            }
+                }));
+                return [...prev, ...newItems];
+            });
         }
-        e.target.value = "";
-    };
+    }, []);
 
     const removeGalleryItem = (index: number) => {
         const item = galleryItems[index];
@@ -145,9 +140,27 @@ export default function BlogEdit() {
         setGalleryItems((prev) => prev.filter((_, i) => i !== index));
     };
 
+    const { getRootProps: getCoverRootProps, getInputProps: getCoverInputProps, isDragActive: isCoverDragActive } = useDropzone({
+        onDrop: onCoverDrop,
+        accept: { 'image/png': ['.png'], 'image/jpeg': ['.jpeg', '.jpg'] },
+        maxSize: 10 * 1024 * 1024,
+        multiple: false
+    });
+
+    const { getRootProps: getGalleryRootProps, getInputProps: getGalleryInputProps, isDragActive: isGalleryDragActive } = useDropzone({
+        onDrop: onGalleryDrop,
+        accept: { 'image/png': ['.png'], 'image/jpeg': ['.jpeg', '.jpg'] },
+        maxSize: 10 * 1024 * 1024
+    });
+
     const onSubmit: SubmitHandler<BlogData> = async (data) => {
         if (isSaving) return;
         setIsSaving(true);
+
+        if (galleryItems.length > 6) {
+        toast.error("รูปภาพประกอบทั้งหมดต้องไม่เกิน 6 รูป");
+        return;
+    }
 
         try {
             const formData = new FormData();
@@ -168,6 +181,7 @@ export default function BlogEdit() {
                     fileIndex++;
                 }
             });
+            
             formData.append("blogImagesMeta", JSON.stringify(blogImagesMeta));
 
             const res = await fetch(`/api/admin/blogs/${blogId}`, { method: "PUT", body: formData });
@@ -192,7 +206,7 @@ export default function BlogEdit() {
             setInitialGalleryUrls(nextGallery.map((img: BlogImageResponse) => img.imageUrl));
         } catch (error: unknown) {
             if (error instanceof Error) {
-                toast.error(`เกิดข้อผิดพลาด: ${error.message || "ไม่สามารถบันทึกได้"}`);
+                toast.error(`${error.message || "ไม่สามารถบันทึกได้"}`);
             }
         } finally {
             setIsSaving(false);
@@ -206,7 +220,6 @@ export default function BlogEdit() {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-[#FFF5E4] flex flex-col items-center justify-center gap-3">
-                <div className="w-12 h-12 rounded-full border-4 border-[#FFE3E1] border-t-[#FF9494] animate-spin" />
                 <p className="text-sm font-semibold text-[#FF9494] animate-pulse">Loading...</p>
             </div>
         );
@@ -247,13 +260,16 @@ export default function BlogEdit() {
                             )}
                         </div>
                         <div className="space-y-3">
-                            <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#FFE3E1] hover:border-[#FF9494] bg-[#FFF5E4]/20 rounded-xl p-6 cursor-pointer transition">
-                                <UploadCloud className="w-8 h-8 text-[#FF9494] mb-2" />
-                                <span className="text-xs font-semibold">คลิกเพื่ออัปโหลดรูปภาพปกใหม่</span>
-                                <input type="file" accept=".png, .jpg, .jpeg" onChange={handleCoverFileChange} className="hidden" />
-                            </label>
+                            <div {...getCoverRootProps()} className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-6 cursor-pointer transition-all duration-200 ${isCoverDragActive ? 'border-[#FF9494] bg-[#FFE3E1]/20 scale-[1.02] shadow-sm' : 'border-[#FFE3E1] hover:border-[#FF9494] bg-[#FFF5E4]/20'}`}>
+                                <input {...getCoverInputProps()} />
+                                <UploadCloud className={`w-8 h-8 text-[#FF9494] mb-2 transition-transform duration-300 ${isCoverDragActive ? 'scale-125' : ''}`} />
+                                <span className="text-xs font-semibold text-center select-none">
+                                    {isCoverDragActive ? "ปล่อยไฟล์ที่นี่..." : "ลากรูปภาพมาวาง หรือ คลิกเพื่ออัปโหลดปกใหม่"}
+                                </span>
+                                <span className="text-[10px] text-[#FF9494]/70 mt-1 select-none">รองรับเฉพาะ .png, .jpg, .jpeg (ไม่เกิน 10MB)</span>
+                            </div>
                             {activeCoverPreview && (
-                                <button type="button" onClick={removeCoverImage} className="w-full py-2 text-xs font-bold text-red-500 hover:bg-red-50 border border-red-200 rounded-xl flex items-center justify-center gap-1.5">
+                                <button type="button" onClick={removeCoverImage} className="w-full py-2 text-xs font-bold text-red-500 hover:bg-red-50 border border-red-200 rounded-xl flex items-center justify-center gap-1.5 transition">
                                     <Trash2 className="w-4 h-4" /> ลบรูปภาพปก
                                 </button>
                             )}
@@ -284,28 +300,42 @@ export default function BlogEdit() {
                 <div className="bg-white rounded-2xl border border-[#FFE3E1] p-6 shadow-sm space-y-4">
                     <div className="flex justify-between items-center pb-2 border-b border-[#FFE3E1]">
                         <h2 className="text-sm font-bold flex items-center gap-2"><span className="w-1.5 h-5 rounded-full bg-[#FF9494]" /> รูปภาพประกอบ ({galleryItems.length} รูป)</h2>
-                        <label className="px-4 py-2 rounded-xl border-2 border-dashed border-[#FFE3E1] hover:border-[#FF9494] cursor-pointer text-xs font-bold flex items-center gap-1.5">
-                            <UploadCloud className="w-4 h-4 text-[#FF9494]" /> อัปโหลดเพิ่ม
-                            <input type="file" accept=".png, .jpg, .jpeg" multiple onChange={handleGalleryFilesChange} className="hidden" />
-                        </label>
+                        <div {...getGalleryRootProps()} className="cursor-pointer">
+                            <input {...getGalleryInputProps()} />
+                            <div className="px-4 py-2 rounded-xl border border-dashed border-[#FFE3E1] hover:border-[#FF9494] bg-[#FFF5E4]/10 hover:bg-[#FFE3E1]/20 text-xs font-bold flex items-center gap-1.5 transition-all">
+                                <UploadCloud className="w-4 h-4 text-[#FF9494]" /> อัปโหลดเพิ่ม
+                            </div>
+                        </div>
                     </div>
 
-                    {galleryItems.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            {galleryItems.map((item, index) => (
-                                <div key={index} className="relative group rounded-xl border border-[#FFE3E1] overflow-hidden aspect-video shadow-sm">
-                                    <Image src={item.imageUrl} alt="gallery" fill className="object-cover" unoptimized />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex justify-end p-2">
-                                        <button type="button" onClick={() => removeGalleryItem(index)} className="p-1.5 bg-red-500 text-white rounded-lg h-fit">
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
+                    <div {...getGalleryRootProps()} className={`outline-none transition-all duration-200 ${isGalleryDragActive ? 'border-2 border-dashed border-[#FF9494] bg-[#FFE3E1]/20 rounded-xl p-4 scale-[1.01]' : ''}`}>
+                        <input {...getGalleryInputProps()} />
+                        {isGalleryDragActive ? (
+                            <div className="flex flex-col items-center justify-center py-8 text-[#FF9494] gap-2 select-none">
+                                <UploadCloud className="w-12 h-12 animate-bounce" />
+                                <p className="text-xs font-bold">ปล่อยไฟล์รูปภาพที่นี่เพื่อเพิ่มรูปประกอบ...</p>
+                            </div>
+                        ) : galleryItems.length > 0 ? (
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                {galleryItems.map((item, index) => (
+                                    <div key={index} className="relative group rounded-xl border border-[#FFE3E1] overflow-hidden aspect-video shadow-sm">
+                                        <Image src={item.imageUrl} alt="gallery" fill className="object-cover" unoptimized />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex justify-end p-2">
+                                            <button type="button" onClick={(e) => { e.stopPropagation(); removeGalleryItem(index); }} className="p-1.5 bg-red-500 text-white rounded-lg h-fit transition hover:bg-red-600">
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-6 border-2 border-dashed border-[#FFE3E1] rounded-xl text-[#FF9494] text-xs bg-[#FFF5E4]/10">ยังไม่มีรูปภาพประกอบ</div>
-                    )}
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 border-2 border-dashed border-[#FFE3E1] rounded-xl text-[#FF9494] text-xs bg-[#FFF5E4]/10 hover:bg-[#FFE3E1]/15 transition-all flex flex-col items-center justify-center gap-2 cursor-pointer select-none">
+                                <UploadCloud className="w-8 h-8" />
+                                <span className="font-semibold">ลากรูปภาพประกอบมาวางที่นี่ หรือ คลิกเพื่อเลือกไฟล์</span>
+                                <span className="text-[10px] text-[#FF9494]/60">รองรับสูงสุด 6 รูป เฉพาะ .png, .jpg, .jpeg (ไฟล์ละไม่เกิน 10MB)</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </form>

@@ -22,7 +22,9 @@ export async function PUT(
         if (!title || !content || !summary) {
             return NextResponse.json({ success: false, error: "กรุณากรอกข้อมูลให้ครบถ้วน" }, { status: 400 });
         }
-
+        if (extraImageFiles.length > 6){
+            return NextResponse.json({ success: false, error: "ไม่สามารถอัปโหลดรูปภาพได้เกิน 6 รูป" }, { status: 400 });
+        }
         const { updatedBlog } = await editBlogService({
             blogId,
             title,
