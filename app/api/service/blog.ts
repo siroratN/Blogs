@@ -19,6 +19,23 @@ interface EditBlogInput {
     extraImageFiles: File[];
 }
 
+function validateImageFile(file: File, fieldName: string) {
+    if (!file || file.size === 0) return;
+    
+    // Check file size (10MB = 10 * 1024 * 1024 bytes)
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+        throw new Error(`ไฟล์รูปภาพ${fieldName}มีขนาดใหญ่เกินกว่าที่กำหนด (ต้องไม่เกิน 10MB)`);
+    }
+
+    // Check file extension
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const allowedExtensions = ['png', 'jpg', 'jpeg'];
+    if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
+        throw new Error(`รูปแบบไฟล์รูปภาพ${fieldName}ไม่ถูกต้อง (รองรับเฉพาะ .png, .jpg, .jpeg เท่านั้น)`);
+    }
+}
+
 interface FetchBlogsInput {
     searchQuery?: string;
     page?: number;
@@ -31,7 +48,14 @@ export async function createBlogService(input: CreateBlogInput) {
     const supabase = await createClient();
 
     try {
+        if (coverImageFile && coverImageFile.size > 0) {
+            validateImageFile(coverImageFile, "หน้าปก");
+        }
+
         const validExtraFiles = extraImageFiles.filter(file => file.size > 0);
+        validExtraFiles.forEach((file, index) => {
+            validateImageFile(file, `ประกอบลำดับที่ ${index + 1}`);
+        });
         
         let generatedSlug = title
             .toLowerCase()
@@ -114,6 +138,15 @@ export async function editBlogService(input: EditBlogInput) {
     const supabase = await createClient();
 
     try {
+        if (coverImage instanceof File && coverImage.size > 0) {
+            validateImageFile(coverImage, "หน้าปก");
+        }
+
+        const validExtraFiles = extraImageFiles.filter(file => file.size > 0);
+        validExtraFiles.forEach((file, index) => {
+            validateImageFile(file, `ประกอบลำดับที่ ${index + 1}`);
+        });
+
         const currentBlog = await prisma.blog.findUnique({
             where: { id: blogId },
             include: { blogImages: true }

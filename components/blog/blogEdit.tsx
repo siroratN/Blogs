@@ -84,6 +84,18 @@ export default function BlogEdit() {
     const handleCoverFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            const ext = file.name.split('.').pop()?.toLowerCase();
+            const allowedExtensions = ['png', 'jpg', 'jpeg'];
+            if (!ext || !allowedExtensions.includes(ext)) {
+                toast.error("รองรับเฉพาะไฟล์รูปภาพนามสกุล .png, .jpg, .jpeg เท่านั้น");
+                e.target.value = "";
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                toast.error("ขนาดไฟล์รูปภาพหน้าปกต้องไม่เกิน 10MB");
+                e.target.value = "";
+                return;
+            }
             setCoverFile(file);
             setCoverFilePreview(URL.createObjectURL(file));
             setCoverCleared(false);
@@ -99,12 +111,30 @@ export default function BlogEdit() {
 
     const handleGalleryFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            const newItems = Array.from(e.target.files).map((file) => ({
-                type: "file" as const,
-                file,
-                imageUrl: URL.createObjectURL(file),
-            }));
-            setGalleryItems((prev) => [...prev, ...newItems]);
+            const allowedExtensions = ['png', 'jpg', 'jpeg'];
+            const validNewItems: GalleryItem[] = [];
+            
+            for (let i = 0; i < e.target.files.length; i++) {
+                const file = e.target.files[i];
+                const ext = file.name.split('.').pop()?.toLowerCase();
+                if (!ext || !allowedExtensions.includes(ext)) {
+                    toast.error(`ไฟล์ ${file.name} ไม่รองรับ (รองรับเฉพาะ .png, .jpg, .jpeg)`);
+                    continue;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    toast.error(`ไฟล์ ${file.name} มีขนาดใหญ่เกินไป (ต้องไม่เกิน 10MB)`);
+                    continue;
+                }
+                validNewItems.push({
+                    type: "file" as const,
+                    file,
+                    imageUrl: URL.createObjectURL(file),
+                });
+            }
+            
+            if (validNewItems.length > 0) {
+                setGalleryItems((prev) => [...prev, ...validNewItems]);
+            }
         }
         e.target.value = "";
     };
@@ -220,7 +250,7 @@ export default function BlogEdit() {
                             <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#FFE3E1] hover:border-[#FF9494] bg-[#FFF5E4]/20 rounded-xl p-6 cursor-pointer transition">
                                 <UploadCloud className="w-8 h-8 text-[#FF9494] mb-2" />
                                 <span className="text-xs font-semibold">คลิกเพื่ออัปโหลดรูปภาพปกใหม่</span>
-                                <input type="file" accept="image/*" onChange={handleCoverFileChange} className="hidden" />
+                                <input type="file" accept=".png, .jpg, .jpeg" onChange={handleCoverFileChange} className="hidden" />
                             </label>
                             {activeCoverPreview && (
                                 <button type="button" onClick={removeCoverImage} className="w-full py-2 text-xs font-bold text-red-500 hover:bg-red-50 border border-red-200 rounded-xl flex items-center justify-center gap-1.5">
@@ -256,7 +286,7 @@ export default function BlogEdit() {
                         <h2 className="text-sm font-bold flex items-center gap-2"><span className="w-1.5 h-5 rounded-full bg-[#FF9494]" /> รูปภาพประกอบ ({galleryItems.length} รูป)</h2>
                         <label className="px-4 py-2 rounded-xl border-2 border-dashed border-[#FFE3E1] hover:border-[#FF9494] cursor-pointer text-xs font-bold flex items-center gap-1.5">
                             <UploadCloud className="w-4 h-4 text-[#FF9494]" /> อัปโหลดเพิ่ม
-                            <input type="file" accept="image/*" multiple onChange={handleGalleryFilesChange} className="hidden" />
+                            <input type="file" accept=".png, .jpg, .jpeg" multiple onChange={handleGalleryFilesChange} className="hidden" />
                         </label>
                     </div>
 
