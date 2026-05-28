@@ -415,7 +415,7 @@ export async function getBlogForSlug() {
         throw new Error("ไม่สามารถดึงข้อมูลบทความได้จากฐานข้อมูล");
     }
 }
-
+// Admin service to edit slug of a blog post
 export async function editSlug(blogId: string, newSlug: string) {
     try {
         const isSlugTaken = await prisma.blog.findFirst({
