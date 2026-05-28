@@ -100,8 +100,6 @@ DIRECT_URL="postgresql://postgres.your-project:[YOUR-PASSWORD]@aws-0-ap-southeas
 # คีย์ลับสำหรับเซ็นชื่อ JWT Token (ตั้งเป็นข้อความยาวๆ อะไรก็ได้)
 JWT_SECRET="your-super-secret-key-make-it-long-and-random-12345"
 
-# URL ของ API หรือ Host (สำหรับรัน Local ให้ตั้งเป็น localhost)
-NEXT_PUBLIC_API_URL="http://localhost:3000"
 ```
 
 ---
