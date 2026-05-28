@@ -4,7 +4,6 @@ import { verifyToken } from "@/lib/auth";
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. CSRF/Access Denied Protection for /api
   if (pathname.startsWith("/api")) {
     const secFetchSite = request.headers.get("sec-fetch-site");
 
@@ -13,7 +12,6 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // 2. Admin Route Protection & JWT Token Validation
   if (pathname.startsWith("/admin")) {
     const token = request.cookies.get("token")?.value;
 
