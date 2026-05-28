@@ -38,7 +38,7 @@ export default function Home({ searchParams }: Props) {
           fallback={
             <div className="text-center py-24 bg-white rounded-2xl border border-[#FFE3E1] shadow-sm max-w-2xl mx-auto my-10 p-8">
               <p className="text-slate-400 font-medium text-base animate-pulse">
-                กำลังโหลดบทความ...
+                Loading
               </p>
             </div>
           }

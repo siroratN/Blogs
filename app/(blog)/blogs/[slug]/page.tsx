@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import CommentForm from "@/components/blog/CommentForm";
-import { Eye, CalendarDays } from "lucide-react";
+import { Eye, CalendarDays, MessageSquare } from "lucide-react";
 import Image from "next/image";
 
 interface Props {
@@ -34,34 +34,36 @@ export default async function BlogDetailPage({ params }: Props) {
     });
 
     return (
-        <main className="w-full bg-white min-h-screen selection:bg-indigo-100 selection:text-indigo-900">
+        <main className="w-full bg-slate-50/50 min-h-screen selection:bg-indigo-50 selection:text-indigo-900 antialiased">
             <div className="w-full">
                 {blog.coverImage ? (
-                    <div className="w-full max-w-screen-2xl mx-auto px-0 sm:px-6 lg:px-10 pt-8 fade-up">
-                        <div className="cover-img-wrapper relative w-full aspect-[21/9] sm:aspect-[16/7] sm:rounded-3xl overflow-hidden shadow-2xl group">
+                    <div className="w-full max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 pt-0 sm:pt-8 animate-fade-in">
+                        <div className="relative w-full aspect-[21/9] sm:aspect-[16/7] sm:rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] group bg-slate-900">
                             <Image
                                 src={blog.coverImage}
                                 alt={blog.title}
-                                className="w-full h-full object-cover"
-                                width={1200}
-                                height={675}
+                                className="w-full h-full object-cover opacity-90 transition-transform duration-700 ease-out group-hover:scale-105"
+                                width={1600}
+                                height={900}
+                                priority
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent hidden sm:block" />
-                            <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-12 z-10 hidden sm:block">
-                                <h1 className="blog-title text-white text-3xl md:text-4xl lg:text-5xl xl:text-6xl max-w-4xl font-black tracking-tight leading-tight drop-shadow-md">
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-transparent hidden sm:block" />
+                            <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-12 hidden sm:block">
+                                <h1 className="text-white text-3xl md:text-4xl lg:text-5xl xl:text-5xl max-w-5xl font-black tracking-tight leading-[1.15]">
                                     {blog.title}
                                 </h1>
-                                <div className="flex items-center gap-4 mt-4">
-                                    <div className="flex gap-1">
-                                        <CalendarDays className="h-4 w-4 text-white/80" />
-                                        <time dateTime={blog.createdAt.toISOString()} className="text-white/70 text-sm font-medium">
+                                <div className="flex items-center gap-5 mt-6 text-slate-300 text-sm font-medium">
+                                    <div className="flex items-center gap-2">
+                                        <CalendarDays className="h-4 w-4 text-indigo-400" />
+                                        <time dateTime={blog.createdAt.toISOString()}>
                                             {new Date(blog.createdAt).toLocaleDateString("th-TH", {
                                                 year: "numeric", month: "long", day: "numeric",
                                             })}
                                         </time>
                                     </div>
-                                    <span className="flex items-center gap-1.5 text-white/80">
-                                        <Eye className="h-4 w-4 text-white/80" />
+                                    <div className="w-1 h-1 rounded-full bg-slate-600" />
+                                    <span className="flex items-center gap-2">
+                                        <Eye className="h-4 w-4 text-indigo-400" />
                                         {blog.viewsCount + 1} ผู้เข้าชม
                                     </span>
                                 </div>
@@ -69,118 +71,136 @@ export default async function BlogDetailPage({ params }: Props) {
                         </div>
                     </div>
                 ) : (
-                    <header className="max-w-4xl mx-auto px-6 pt-14 pb-4 fade-up">
-                        <p className="section-label mb-3 text-xs uppercase tracking-widest text-blue-600 font-bold">บทความ</p>
-                        <h1 className="blog-title text-gray-950 text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6 tracking-tight">
+                    <header className="max-w-4xl mx-auto px-6 pt-16 pb-4 animate-fade-in">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wider text-indigo-600 uppercase bg-indigo-50 border border-indigo-100 mb-4">
+                            บทความ
+                        </span>
+                        <h1 className="text-slate-900 text-4xl md:text-5xl lg:text-5xl font-black leading-tight mb-6 tracking-tight">
                             {blog.title}
                         </h1>
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                            <CalendarDays className="h-4 w-4" />
-                            <time dateTime={blog.createdAt.toISOString()} className="font-medium">
-                                {new Date(blog.createdAt).toLocaleDateString("th-TH", {
-                                    year: "numeric", month: "long", day: "numeric",
-                                })}
-                            </time>
-                            <span className="flex items-center gap-1.5 ">
-                                <Eye className="h-4 w-4" />
+                        <div className="flex items-center gap-5 text-sm text-slate-500 font-medium">
+                            <div className="flex items-center gap-2">
+                                <CalendarDays className="h-4 w-4 text-slate-400" />
+                                <time dateTime={blog.createdAt.toISOString()}>
+                                    {new Date(blog.createdAt).toLocaleDateString("th-TH", {
+                                        year: "numeric", month: "long", day: "numeric",
+                                    })}
+                                </time>
+                            </div>
+                            <div className="w-1 h-1 rounded-full bg-slate-300" />
+                            <span className="flex items-center gap-2">
+                                <Eye className="h-4 w-4 text-slate-400" />
                                 {blog.viewsCount + 1} ผู้เข้าชม
                             </span>
                         </div>
                     </header>
                 )}
-
                 {blog.coverImage && (
-                    <header className="sm:hidden px-5 pt-7 pb-2 fade-up fade-up-delay-1">
-                        <p className="section-label mb-2">บทความ</p>
-                        <h1 className="blog-title text-gray-950 text-3xl leading-tight mb-3">
+                    <header className="sm:hidden px-6 pt-8 pb-2 animate-fade-in">
+                        <span className="text-[10px] font-bold tracking-widest text-indigo-600 uppercase bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">
+                            บทความ
+                        </span>
+                        <h1 className="text-slate-900 text-2xl font-extrabold leading-tight mt-4 mb-4 tracking-tight">
                             {blog.title}
                         </h1>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                        <div className="flex items-center gap-4 text-xs text-slate-500 font-medium">
                             <time dateTime={blog.createdAt.toISOString()}>
                                 {new Date(blog.createdAt).toLocaleDateString("th-TH", {
                                     year: "numeric", month: "long", day: "numeric",
                                 })}
                             </time>
-                            <span className="text-gray-300">·</span>
+                            <div className="w-1 h-1 rounded-full bg-slate-300" />
                             <span>{blog.viewsCount + 1} ผู้เข้าชม</span>
                         </div>
                     </header>
                 )}
 
-                <div className="max-w-screen-xl mx-auto px-5 sm:px-8 lg:px-10 mt-12 grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-20 items-start pb-24">
-                    <main className="lg:col-span-7 xl:col-span-8 fade-up fade-up-delay-2">
-                        <div className="blog-body whitespace-pre-line">
+
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 lg:mt-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start pb-32">
+                    
+                    <article className="lg:col-span-7 xl:col-span-8 bg-white p-6 sm:p-10 rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+                        <div className="text-slate-800 text-base sm:text-lg leading-[1.85] whitespace-pre-line tracking-normal font-normal break-words selection:bg-indigo-100/60">
                             {blog.content}
                         </div>
 
                         {blog.blogImages && blog.blogImages.length > 0 && (
-                            <>
-                                <div className="divider-ornament">
-                                    <span className="section-label">รูปภาพประกอบ</span>
+                            <div className="mt-14 pt-10 border-t border-slate-100">
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="h-4 w-1 bg-indigo-500 rounded-full" />
+                                    <h3 className="text-sm uppercase tracking-wider text-slate-400 font-bold">รูปภาพประกอบบทความ</h3>
                                 </div>
-                                <section className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                                <section className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     {blog.blogImages.map((img) => (
-                                        <div key={img.id} className="gallery-item relative aspect-video overflow-hidden rounded-2xl bg-gray-100 cursor-zoom-in shadow-sm ring-1 ring-black/5">
+                                        <div key={img.id} className="group relative overflow-hidden rounded-2xl bg-slate-50 shadow-sm ring-1 ring-slate-900/5 transition-all duration-300 hover:shadow-md hover:ring-slate-950/10">
                                             <Image 
-                                            width={800}
-                                            height={450}
-                                            src={img.imageUrl} 
-                                            alt="ภาพประกอบบทความ" 
-                                            className="gallery-img w-full h-full object-cover" />
+                                                width={800}
+                                                height={450}
+                                                src={img.imageUrl} 
+                                                alt="ภาพประกอบบทความ" 
+                                                className="w-full h-full object-cover" 
+                                            />
                                         </div>
                                     ))}
                                 </section>
-                            </>
+                            </div>
                         )}
-                    </main>
+                    </article>
 
-                    <aside className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-10 space-y-10 fade-up fade-up-delay-3">
-                        <section className="rounded-3xl border border-gray-100 bg-gray-50/60 p-7 shadow-sm">
-                            <h2 className="blog-title text-gray-900 text-xl mb-1">ร่วมแสดงความคิดเห็น</h2>
-                            <p className="text-xs text-gray-400 mb-5 leading-relaxed">ความคิดเห็นจะแสดงหลังผ่านการตรวจสอบจากทีมงาน</p>
+                    <aside className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 space-y-8">
+                        <section className="rounded-3xl border border-slate-100 bg-white p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.03)] backdrop-blur-md">
+                            <h2 className="text-slate-900 font-black text-xl mb-1.5 tracking-tight">ร่วมแสดงความคิดเห็น</h2>
+                            <p className="text-xs text-slate-400 mb-6 leading-relaxed">ความคิดเห็นของคุณจะได้รับการตรวจสอบจากทีมงานก่อนเผยแพร่ลงเว็บไซต์</p>
                             <CommentForm blogId={blog.id} />
                         </section>
 
-                        <section>
-                            <div className="flex items-center justify-between mb-5">
-                                <div><p className="section-label mb-1">ความเห็นทั้งหมด</p></div>
+                        <section className="space-y-4">
+                            <div className="flex items-center justify-between px-2 mb-4">
+                                <div className="flex items-center gap-2">
+                                    <MessageSquare className="h-4 w-4 text-slate-400" />
+                                    <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider">ความคิดเห็น</h3>
+                                </div>
                                 {blog.comments.length > 0 && (
-                                    <span className="text-xs font-bold bg-gray-900 text-white px-3 py-1 rounded-full">{blog.comments.length}</span>
+                                    <span className="text-xs font-bold bg-slate-900 text-white px-2.5 py-0.5 rounded-full shadow-sm">
+                                        {blog.comments.length}
+                                    </span>
                                 )}
                             </div>
 
                             {blog.comments.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center text-center text-gray-400 bg-gray-50 py-12 rounded-2xl border border-dashed border-gray-200 gap-2">
-                                    <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                    </svg>
-                                    <p className="text-sm font-medium text-gray-400">ยังไม่มีความคิดเห็น</p>
-                                    <p className="text-xs text-gray-300">มาเป็นคนแรกที่แชร์ความคิดเห็น!</p>
+                                <div className="flex flex-col items-center justify-center text-center p-10 bg-white rounded-3xl border border-dashed border-slate-200 gap-3 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+                                    <div className="p-3 bg-slate-50 rounded-full text-slate-400">
+                                        <MessageSquare className="w-6 h-6 stroke-[1.5]" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-700">ยังไม่มีความคิดเห็น</p>
+                                        <p className="text-xs text-slate-400 mt-0.5">มาเป็นคนแรกที่แชร์ความคิดเห็นในบทความนี้กัน!</p>
+                                    </div>
                                 </div>
                             ) : (
-                                <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1 custom-scrollbar">
+                                <div className="space-y-3.5 max-h-[580px] overflow-y-auto pr-1.5 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
                                     {blog.comments.map((comment) => (
-                                        <div key={comment.id} className="comment-card bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-                                            <div className="flex items-center gap-3 mb-2.5">
-                                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 text-white flex items-center justify-center font-bold text-sm shadow-inner flex-shrink-0">
+                                        <div key={comment.id} className="bg-white rounded-2xl border border-slate-100/80 p-5 shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-all duration-200 hover:border-slate-200/60">
+                                            <div className="flex items-center gap-3.5 mb-3">
+                                                <div className="w-9 h-9 rounded-full bg-black text-white flex items-center justify-center font-bold text-xs shadow-sm flex-shrink-0">
                                                     {comment.authorName.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <p className="font-semibold text-sm text-gray-900 leading-tight">{comment.authorName}</p>
-                                                    <time className="text-[11px] text-gray-400">
+                                                    <p className="font-bold text-sm text-slate-900 leading-tight">{comment.authorName}</p>
+                                                    <time className="text-[10px] text-slate-400 font-medium">
                                                         {new Date(comment.createdAt).toLocaleDateString("th-TH", {
                                                             year: "numeric", month: "short", day: "numeric",
                                                         })}
                                                     </time>
                                                 </div>
                                             </div>
-                                            <p className="text-gray-700 text-sm leading-relaxed pl-12">{comment.content}</p>
+                                            <p className="text-slate-600 text-sm leading-relaxed pl-12 whitespace-pre-line">{comment.content}</p>
                                         </div>
                                     ))}
                                 </div>
                             )}
                         </section>
                     </aside>
+
                 </div>
             </div>
         </main>

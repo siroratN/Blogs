@@ -1,16 +1,41 @@
-import { updateSession } from "@/lib/supabase/proxy";
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { verifyToken } from "@/lib/auth";
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // 1. CSRF/Access Denied Protection for /api
   if (pathname.startsWith("/api")) {
     const secFetchSite = request.headers.get("sec-fetch-site");
 
     if (secFetchSite === "none" || secFetchSite === "cross-site") {
       return NextResponse.json({ error: "Access Denied" }, { status: 403 });
-    }     
+    }
   }
-  return await updateSession(request);
+
+  // 2. Admin Route Protection & JWT Token Validation
+  if (pathname.startsWith("/admin")) {
+    const token = request.cookies.get("token")?.value;
+
+    if (!token) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/login";
+      return NextResponse.redirect(url);
+    }
+
+    const payload = await verifyToken(token);
+
+    if (!payload || payload.role !== "admin") {
+      console.log("Unauthorized access attempt to admin page:", payload?.email || "No token");
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/login";
+      return NextResponse.redirect(url);
+    }
+  }
+
+  return NextResponse.next({
+    request,
+  });
 }
 
 export const config = {
