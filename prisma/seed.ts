@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 async function main() {
     console.log("Starting database seeding...");
 
-    // 1. Clear existing data
     try {
         console.log("Clearing existing data...");
         await prisma.comment.deleteMany({});
@@ -18,7 +17,7 @@ async function main() {
         console.warn("Could not clear database. This might be normal if tables do not exist yet:", e);
     }
 
-    // 2. Seed Admin User
+    // Seed Admin User
     const adminEmail = "admin@example.com";
     const hashedPassword = await bcrypt.hash("admin123", 10);
     const adminUser = await prisma.user.create({
@@ -31,7 +30,7 @@ async function main() {
     });
     console.log("Seeded admin user:", adminUser.email);
 
-    // 3. Seed 11 Blog Posts
+    // Seed 11 Blog Posts
     const blogsData = [
         {
             title: "ถอดรหัสโครงสร้างพล็อต: ทำไมภาพยนตร์บางเรื่องถึงดึงอารมณ์เราได้อยู่หมัด",
