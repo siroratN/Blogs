@@ -178,7 +178,7 @@ npm run dev
 ## โครงสร้างโปรเจกต์ที่สำคัญ (Project Structure)
 *   `app/(blog)` - หน้าแสดงผลหน้าแรก, ดีเทลบล็อก และการเข้าใช้งานแบบผู้ใช้ทั่วไป
 *   `app/(admin)` - แผงควบคุมหลังบ้านสำหรับเขียนบล็อก จัดการคอมเมนต์ ความคิดเห็น
-*   `app/api/auth` - API endpoints ในการทำระบบ Sign-Up, Login และ Logout แบบปลอดภัย
+*   `app/api/auth` - API endpoints ในการทำระบบ Sign-Up, Login และ Logout
 *   `lib/auth.ts` - ตัวช่วยการแฮชรหัสผ่าน จัดการเซสชัน และตรวจสิทธิ์คุกกี้ JWT
 *   `prisma/schema.prisma` - โครงสร้างตาราง (Database models) สำหรับ Prisma ORM
 *   `prisma/seed.ts` - สคริปต์สร้างข้อมูลจำลองเพื่อเตรียมบล็อกและแอดมิน
