@@ -68,7 +68,7 @@ export async function setAuthCookie(token: string) {
     const cookieStore = await cookies();
     cookieStore.set(COOKIE_NAME, token, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         maxAge,
         path: "/",
@@ -79,4 +79,5 @@ export async function setAuthCookie(token: string) {
 export async function deleteAuthCookie() {
     const cookieStore = await cookies();
     cookieStore.delete(COOKIE_NAME);
+    
 }

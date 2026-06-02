@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export function LoginForm({
@@ -22,7 +22,6 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const isRegistered = searchParams.get("registered") === "true";
 
@@ -41,6 +40,7 @@ export function LoginForm({
       });
 
       const data = await res.json();
+      console.log(data)
 
       if (!res.ok) {
         throw new Error(data.error || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
@@ -51,8 +51,7 @@ export function LoginForm({
           await fetch("/api/auth/logout", { method: "POST" });
           throw new Error("คุณไม่มีสิทธิ์เข้าใช้งานในส่วนนี้");
         }
-
-        router.push("/admin");
+        window.location.href = "/admin";
       }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");

@@ -44,7 +44,9 @@ export async function POST(request: Request) {
         });
 
         // Set token cookie
-        const response = NextResponse.json({
+        await setAuthCookie(token);
+
+        return NextResponse.json({
             success: true,
             message: 'เข้าสู่ระบบสำเร็จ',
             user: {
@@ -53,10 +55,6 @@ export async function POST(request: Request) {
                 role: user.role,
             },
         });
-
-        setAuthCookie(token, response.headers);
-
-        return response;
     } catch (error) {
         console.error('Login API Error:', error);
         return NextResponse.json(
