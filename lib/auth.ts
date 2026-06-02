@@ -66,7 +66,6 @@ export async function getAuthUser(): Promise<JWTPayload | null> {
 export async function setAuthCookie(token: string) {
     const maxAge = 7 * 24 * 60 * 60; // 7 วัน
     const cookieStore = await cookies();
-    // const cookieString = `${COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`;
     cookieStore.set(COOKIE_NAME, token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
