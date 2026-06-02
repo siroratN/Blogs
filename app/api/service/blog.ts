@@ -438,3 +438,4 @@ export async function editSlug(blogId: string, newSlug: string) {
         throw new Error("ไม่สามารถแก้ไข slug ได้");
     }
 }
+

@@ -53,7 +53,6 @@ export function LoginForm({
         }
 
         router.push("/admin");
-        router.refresh();
       }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");

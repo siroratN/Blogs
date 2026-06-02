@@ -63,17 +63,21 @@ export async function getAuthUser(): Promise<JWTPayload | null> {
 }
 
 //set httpOnly auth cookie in responses
-export function setAuthCookie(token: string, responseHeaders: Headers) {
+export async function setAuthCookie(token: string) {
     const maxAge = 7 * 24 * 60 * 60; // 7 วัน
-    const cookieString = `${COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`;
-    
-    responseHeaders.append('Set-Cookie', cookieString);
+    const cookieStore = await cookies();
+    // const cookieString = `${COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`;
+    cookieStore.set(COOKIE_NAME, token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge,
+        path: "/",
+    });
 }
 
 //clear auth cookie on logout
-export function deleteAuthCookie(responseHeaders?: Headers) {
-    const cookieString = `${COOKIE_NAME}=; Path=/; HttpOnly; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-    if (responseHeaders) {
-        responseHeaders.append('Set-Cookie', cookieString);
-    }
+export async function deleteAuthCookie() {
+    const cookieStore = await cookies();
+    cookieStore.delete(COOKIE_NAME);
 }
