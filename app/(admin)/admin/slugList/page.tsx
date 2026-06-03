@@ -51,7 +51,7 @@ export default function SlugEdit() {
         setDraftSlug(val);
         if (!val.trim()) {
             setSlugError("กรุณาระบุ URL Slug");
-        } else if (/[^a-z0-9-邻]/.test(val)) {
+        } else if (/[^a-z0-9]/.test(val)) {
             setSlugError("Slug ควรประกอบด้วยตัวพิมพ์เล็ก ตัวเลข และเครื่องหมาย - เท่านั้น");
         } else {
             setSlugError("");
